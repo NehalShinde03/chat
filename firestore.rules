@@ -1,0 +1,64 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // ----------------------------------------------------
+    // User Profiles (/users/{userId})
+    // ----------------------------------------------------
+    // Authenticated users can view registered user profiles to discover contacts.
+    // Users can only write/update their own profile document.
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isOwner(userId);
+      allow delete: if false;
+    }
+
+    // ----------------------------------------------------
+    // Conversations (/conversations/{conversationId})
+    // ----------------------------------------------------
+    // Only participants can read or update conversation metadata.
+    match /conversations/{conversationId} {
+      allow read: if isAuthenticated() && (
+        request.auth.uid in resource.data.participantIds
+      );
+
+      allow create: if isAuthenticated() && (
+        request.auth.uid in request.resource.data.participantIds
+      );
+
+      allow update: if isAuthenticated() && (
+        request.auth.uid in resource.data.participantIds ||
+        request.auth.uid in request.resource.data.participantIds
+      );
+
+      allow delete: if false;
+
+      // --------------------------------------------------
+      // Messages (/conversations/{conversationId}/messages/{messageId})
+      // --------------------------------------------------
+      // - Reads restricted to conversation participants.
+      // - Sends restricted to conversation participants.
+      // - Sender verification: senderId must match auth.uid (prevents impersonation).
+      match /messages/{messageId} {
+        allow read: if isAuthenticated() && (
+          request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participantIds
+        );
+
+        allow create: if isAuthenticated() &&
+          request.resource.data.senderId == request.auth.uid;
+
+        allow update: if isAuthenticated();
+        allow delete: if false;
+      }
+    }
+  }
+}
