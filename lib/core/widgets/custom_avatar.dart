@@ -3,6 +3,7 @@ import '../constants/app_colors.dart';
 
 class CustomAvatar extends StatelessWidget {
   final String? imageUrl;
+  final ImageProvider? imageProvider;
   final String name;
   final double radius;
   final bool showOnlineIndicator;
@@ -12,6 +13,7 @@ class CustomAvatar extends StatelessWidget {
   const CustomAvatar({
     super.key,
     this.imageUrl,
+    this.imageProvider,
     required this.name,
     this.radius = 24,
     this.showOnlineIndicator = false,
@@ -49,10 +51,12 @@ class CustomAvatar extends StatelessWidget {
         CircleAvatar(
           radius: radius,
           backgroundColor: _generateColor(name),
-          backgroundImage: (imageUrl != null && imageUrl!.startsWith('http'))
-              ? NetworkImage(imageUrl!)
-              : null,
-          child: (imageUrl == null || !imageUrl!.startsWith('http'))
+          backgroundImage: imageProvider ??
+              ((imageUrl != null && imageUrl!.startsWith('http'))
+                  ? NetworkImage(imageUrl!)
+                  : null),
+          child: (imageProvider == null &&
+                  (imageUrl == null || !imageUrl!.startsWith('http')))
               ? Text(
                   _initials,
                   style: TextStyle(

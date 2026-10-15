@@ -35,4 +35,15 @@ class AppColors {
   static const Color iconMuted = Color(0xFF8696A0);
   static const Color voiceWaveform = Color(0xFF34B7F1);
   static const Color voiceWaveformDark = Color(0xFF00A884);
+
+  // Profile Screen Palette
+  static const Color profileBackground = Color(0xFFFCF7F4);
+  static const Color profileCardBackground = Colors.white;
+  static const Color profileIconBackground = Color(0xFFF2E2DB);
+  static const Color profileIcon = Color(0xFF512C35);
+  static const Color profileTextPrimary = Color(0xFF261D1E);
+  static const Color profileTextSecondary = Color(0xFFA29697);
+  static const Color profileDivider = Color(0xFFF0EBE7);
+  static const Color profileNavInactive = Color(0xFF9B858A);
+  static const Color profileNavActive = Color(0xFF512C35);
 }

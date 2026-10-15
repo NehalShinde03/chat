@@ -1,11 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/theme/theme_cubit.dart';
 import '../../../../core/utils/responsive_layout.dart';
-import '../../../../core/widgets/custom_avatar.dart';
 import '../../../../core/widgets/empty_state_view.dart';
 import '../../../../core/widgets/skeleton_loader.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
@@ -18,6 +16,7 @@ import '../widgets/chat_tile.dart';
 import 'archived_chats_page.dart';
 import 'chat_room_page.dart';
 import 'new_chat_page.dart';
+import '../../../profile/presentation/pages/profile_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -64,63 +63,6 @@ class _HomePageState extends State<HomePage> {
       context,
       MaterialPageRoute(
         builder: (_) => const NewChatPage(),
-      ),
-    );
-  }
-
-  void _showUserProfileDialog(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('My Profile', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CustomAvatar(
-              imageUrl: user?.photoURL,
-              name: user?.displayName ?? 'You',
-              radius: 40,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              user?.displayName ?? 'WhatsApp User',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              user?.email ?? '',
-              style: TextStyle(
-                fontSize: 14,
-                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppColors.teal.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: const Text(
-                'Connected with Google Account',
-                style: TextStyle(
-                  color: AppColors.teal,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Close'),
-          ),
-        ],
       ),
     );
   }
@@ -201,7 +143,12 @@ class _HomePageState extends State<HomePage> {
             if (value == 'new_chat') {
               _openNewChat();
             } else if (value == 'profile') {
-              _showUserProfileDialog(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const ProfilePage(showBackButton: true),
+                ),
+              );
             } else if (value == 'archived') {
               Navigator.push(
                 context,
